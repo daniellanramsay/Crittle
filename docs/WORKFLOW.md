@@ -148,7 +148,7 @@ To stop partway through a phase, use `/handoff` (§10).
 
 **First time on the iPad (Phase 0)**
 
-1. Open Safari and go to `https://<your-username>.github.io/MyVirtualPet/`.
+1. Open Safari and go to `https://<your-username>.github.io/Crittle/`.
 2. Tap Share, then Add to Home Screen. Keep **Open as Web App** switched on, then tap Add.
 3. Optionally drag the icon into the Dock.
 
@@ -242,7 +242,7 @@ Then end the session. The next phase starts fresh.
 
 - **The folder:** rename it any time Claude Code isn't running. No code depends on the folder name, but these docs use `C:\Users\danie\MyVirtualPet` in their examples; ask Claude Code to update those lines afterwards. Earlier conversations won't appear in `claude --continue` afterwards, which doesn't matter because the files carry everything.
 - **The app's name (D8):** Phase 6 sets the name, short name and window title.
-- **The GitHub repository:** renaming it changes the app's web address from `…github.io/MyVirtualPet/` to `…github.io/<new-name>/`. The installed apps point at the old address, so reinstall on both devices. The iPad app's saved cat does not carry over to a new install. Rename before Phase 6 if you can; otherwise export a backup first (A3). Afterwards, ask Claude Code to update the remote address (`git remote set-url origin <new address>`).
+- **The GitHub repository:** renaming it changes the app's web address from `…github.io/Crittle/` to `…github.io/<new-name>/`. The installed apps point at the old address, so reinstall on both devices. The iPad app's saved cat does not carry over to a new install. Rename before Phase 6 if you can; otherwise export a backup first (A3). Afterwards, ask Claude Code to update the remote address (`git remote set-url origin <new address>`).
 
 ---
 
