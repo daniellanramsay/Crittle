@@ -139,7 +139,7 @@ Numbers the plan left to a phase (for example object positions in Phase 1, purr 
 
 | Phase | Finished | Tag | Version | Notes |
 | --- | --- | --- | --- | --- |
-| 0 | — | — | — | |
+| 0 | — | — | — | Laptop, Edge at localhost (31 Oct 2026): 48.3 fps, 19.8 ms average over the last 60 detections, GPU delegate, video 640 × 480. The first camera start failed once with `NotReadableError: Could not start video source`; Try again worked. |
 | 1 | — | — | — | |
 | 2 | — | — | — | |
 | 3 | — | — | — | |
