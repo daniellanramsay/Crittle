@@ -1,0 +1,9 @@
+{
+  "name": "my-virtual-pet",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "serve": "npx --yes serve@14.2.6 -l tcp://localhost:3000 ."
+  }
+}
