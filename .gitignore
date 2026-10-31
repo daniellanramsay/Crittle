@@ -1,0 +1,24 @@
+# Daniella's private source art. The repository is public, so it stays on the laptop.
+art/source/*
+!art/source/README.md
+
+# Hand recordings for the gesture tests stay on this laptop (D9). Remove the next line to commit them.
+tests/fixtures/gesture-*.json
+
+# Node and npm
+node_modules/
+*.tgz
+/package/
+
+# Claude Code personal files
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Operating system files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/

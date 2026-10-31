@@ -1,0 +1,13 @@
+# Store text files with LF line endings, in the repository and on disk, on every computer.
+* text=auto eol=lf
+
+# Binary files: git never changes their bytes.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.psd binary
+*.kra binary
+*.wasm binary
+*.task binary
+*.tgz binary
