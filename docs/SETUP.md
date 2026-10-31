@@ -56,12 +56,12 @@ Why: every commit records an email address, and this repository will be public. 
 ## 5. Create the empty repository
 
 1. On github.com, click **+** (top right), then **New repository**.
-2. Repository name: `my-virtual-pet`. Use lowercase and hyphens, because the name becomes part of the app's web address.
+2. Repository name: `MyVirtualPet` (`DECISIONS.md` §3). The name becomes part of the app's web address.
 3. Choose **Public**.
 4. Leave **Add a README**, **.gitignore** and **license** all off. The repository must start empty.
-5. Click **Create repository**, then copy the HTTPS address shown, for example `https://github.com/YOUR-USERNAME/my-virtual-pet.git`. Claude Code asks for it in Phase 0.
+5. Click **Create repository**, then copy the HTTPS address shown, for example `https://github.com/YOUR-USERNAME/MyVirtualPet.git`. Claude Code asks for it in Phase 0.
 
-Your app's web address will be `https://YOUR-USERNAME.github.io/my-virtual-pet/`.
+Your app's web address will be `https://YOUR-USERNAME.github.io/MyVirtualPet/`.
 
 Why public: GitHub Pages is free only for public repositories, so anyone can see what you commit. Your Krita files stay out because `art/source/` is git-ignored. You switch GitHub Pages on in Phase 0, after the first upload.
 

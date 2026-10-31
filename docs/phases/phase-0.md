@@ -141,7 +141,7 @@ The cat, the room, needs, `storage.js`, `events.js`, gestures, smoothing and sce
 - **Timestamps:** `detectForVideo(video, timestamp)` needs a strictly increasing timestamp, so skip a frame if `performance.now()` hasn't advanced.
 - **Mirroring:** feed MediaPipe the unmirrored video and mirror only the display (CSS `transform: scaleX(-1)` on the video and the overlay together), so the dots stay aligned with the hand.
 - **Service worker and navigation:** older browsers threw when a navigation request was rebuilt with options, as in `fetch(event.request, { cache: 'no-cache' })`; current ones quietly change its mode instead. Fetching navigations by URL, `fetch(event.request.url, { cache: 'no-cache' })`, avoids the question on every browser.
-- **Paths:** register `./sw.js` and keep every path relative; the site lives at `/my-virtual-pet/`, not at `/`.
+- **Paths:** register `./sw.js` and keep every path relative; the site lives at `/MyVirtualPet/`, not at `/`.
 - **Caches:** delete only caches that start with `vpet-`. Other projects on the same GitHub Pages origin have caches too.
 - **Camera at launch:** never start it automatically. The iPad asks permission on every launch, and that is expected.
 - **GPU delegate:** it may fail on one device. The CPU fallback is acceptable if the fps targets are met; record which is used.

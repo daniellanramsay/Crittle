@@ -94,6 +94,7 @@ Changes made after the plan doc, newest last. Each is already written into `docs
 | 2026-10-31 | If the first detection with the GPU delegate fails, `hands.js` switches to CPU once and logs it (PLAN §6.1) | GPU creation can succeed while detection still fails |
 | 2026-10-31 | A camera stream that ends unexpectedly after the first 3 s also shows the failed state, with Try again (PLAN §6.6) | Otherwise a frozen picture would show as "on" |
 | 2026-10-31 | Visual CSS values (spacing, font sizes) are not tunable numbers and aren't listed in `config.js` or §6, as long as they meet the accessibility rules in `CLAUDE.md` | Daniella's choice in the Phase 0 plan |
+| 2026-10-31 | The GitHub repository is named `MyVirtualPet`, not `my-virtual-pet`, so the app's address is `https://daniellanramsay.github.io/MyVirtualPet/`. SETUP §5, WORKFLOW and the Phase 0 brief now use that name. `package.json` keeps `my-virtual-pet`, because npm package names must be lowercase | Daniella's choice when she created the repository |
 
 ---
 
@@ -106,7 +107,7 @@ Filled in during Phase 0 (and Phase 5 for art tools). Change only with a dated n
 | `@mediapipe/tasks-vision` | 1.1.1 | `vendor/mediapipe/` | 31 Oct 2026 | Rule: newest stable release (not rc, not nightly) published at least 14 days before Phase 0. On 31 Oct 2026 that was 1.1.1 (published 14 Oct 2026); 1.2.0 (27 Oct 2026) was too new. npm tarball shasum `9a219124017db10bbeb4aedca86d367a640c555d`. Copied: `vision_bundle.mjs`, `package.json`, and in `wasm/` the `vision_wasm_internal` and `vision_wasm_nosimd_internal` pairs (`.js` and `.wasm`). Its type definitions were checked against the calls in the Phase 0 brief, step 12 |
 | Hand model `hand_landmarker.task` | float16, version 1 | `vendor/mediapipe/` | 31 Oct 2026 | From `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`; 7,819,105 bytes; SHA-256 `FBC2A30080C3C557093B5DDFC334698132EB341044CCEE322CCF8BCF3607CDE1` |
 | `serve` (local server) | 14.2.6 | `npm run serve` (npx) | 31 Oct 2026 | Development only |
-| App address | — | GitHub Pages | — | `https://<username>.github.io/my-virtual-pet/`, recorded in Phase 0 |
+| App address | — | GitHub Pages | — | `https://<username>.github.io/MyVirtualPet/`, recorded in Phase 0 |
 | Node.js | v24.20.0 | Laptop | 31 Oct 2026 | Development only; version 22 or newer |
 | Art tool libraries | — | devDependencies | — | Phase 5 |
 
