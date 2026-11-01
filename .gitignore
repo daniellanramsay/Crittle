@@ -12,6 +12,7 @@ node_modules/
 
 # Claude Code personal files
 .claude/settings.local.json
+.claude/launch.json
 CLAUDE.local.md
 
 # Operating system files
