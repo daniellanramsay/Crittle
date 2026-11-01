@@ -202,7 +202,7 @@ MyVirtualPet/
 │  ├─ input/pointer.js       touch and mouse → events
 │  ├─ input/camera.js        start, stop and retry the camera
 │  ├─ input/hands.js         MediaPipe wrapper → raw landmarks per frame
-│  ├─ input/hands.worker.js  only if Phase 0 moves detection into a worker
+│  ├─ input/hands.worker.js  detection in a worker (Phase 0 decision)
 │  ├─ input/handmath.js      smoothing, mirroring, scene mapping, hand scale (pure)
 │  ├─ input/gestures.js      palm, pinch, point, thumb taps → gesture state and events (pure)
 │  ├─ render/rig.js          cut-out cat: hierarchy, pivots, poses, blending
@@ -428,7 +428,7 @@ One hand is tracked at a time, and five hand states drive every interaction. Eac
 6. **Map to the scene.** The central part of the camera frame (x from 0.15 to 0.85, y from 0.10 to 0.80) maps to the whole scene, clamped at the edges, so the hand never needs to reach the edge of the frame.
 7. **Scale.** *s* is the distance from the wrist (landmark 0) to the middle-finger knuckle (landmark 9). Every distance threshold below is a multiple of *s*, so gestures work near to or far from the camera. Distances are measured in video pixels (x × videoWidth, y × videoHeight), not raw normalised units, because those are stretched differently in x and y.
 
-Detection calls are synchronous and block the page while they run; Google suggests running them in a web worker. Phase 0 measures this: if one detection takes more than 12 ms on the iPad (judged on the 60-detection average, with a hand in view), detection moves into a worker.
+Detection calls are synchronous and block the page while they run; Google suggests running them in a web worker. Phase 0 measures this: if one detection takes more than 12 ms on the iPad (judged on the 60-detection average, with a hand in view), detection moves into a worker. **Decided in Phase 0 (`DECISIONS.md` §3): detection runs in `src/input/hands.worker.js`.** The page fetches the worker's files, so the service worker stores them, and lends MediaPipe a canvas from the page; if the worker can't start, detection runs on the page.
 
 ### 6.2 Landmarks used
 
