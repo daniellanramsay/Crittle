@@ -140,7 +140,7 @@ Numbers the plan left to a phase (for example object positions in Phase 1, purr 
 
 | Phase | Finished | Tag | Version | Notes |
 | --- | --- | --- | --- | --- |
-| 0 | — | — | — | Laptop, Edge at localhost (31 Oct 2026): 48.3 fps, 19.8 ms average over the last 60 detections, GPU delegate, video 640 × 480. The first camera start failed once with `NotReadableError: Could not start video source`; Try again worked. |
+| 0 | — | — | — | Laptop, Edge at localhost (31 Oct 2026): 48.3 fps, 19.8 ms average over the last 60 detections, GPU delegate, video 640 × 480. The first camera start failed once with `NotReadableError: Could not start video source`; Try again worked. Laptop, installed app from GitHub Pages: online 60.0 fps, 12.3 ms, GPU, 640 × 480; offline (Wi-Fi off) 38.4 fps, 24.9 ms, GPU, 640 × 480. Offline it opened and tracked hands, but the camera and the first landmarks took a long time to appear, and the page lagged just before. |
 | 1 | — | — | — | |
 | 2 | — | — | — | |
 | 3 | — | — | — | |
