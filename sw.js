@@ -16,6 +16,7 @@ const APP_SHELL = [
   './src/ui/errorlog.js',
   './src/input/camera.js',
   './src/input/hands.js',
+  './src/input/hands.worker.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',

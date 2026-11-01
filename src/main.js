@@ -126,8 +126,9 @@ function showReadouts() {
   const measured = stats && stats.count > 1;
   $('readout-rate').textContent = measured ? `${stats.rate.toFixed(1)} fps` : '–';
   $('readout-time').textContent = measured ? `${stats.time.toFixed(1)} ms (last ${stats.count})` : '–';
+  // For example "GPU (worker)": the delegate, and where detection runs.
   $('readout-delegate').textContent = hands
-    ? DELEGATE_TEXT[hands.status]
+    ? `${DELEGATE_TEXT[hands.status]} (${hands.where})`
     : handsLoading ? 'loading…' : handsFailed ? 'failed' : '–';
   $('readout-video').textContent = video.videoWidth ? `${video.videoWidth} × ${video.videoHeight}` : '–';
 }
