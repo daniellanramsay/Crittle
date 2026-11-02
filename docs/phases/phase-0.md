@@ -1,6 +1,6 @@
 # Phase 0: Prove the risky parts
 
-Status: Not started
+Status: Done 1 Nov 2026, tag phase-0, version 0.0.2
 
 - **Versions during this phase:** 0.0.x
 - **Previous phase:** none. `docs/SETUP.md` must be complete.
@@ -122,14 +122,14 @@ The installed app on both devices starts the camera from a button and draws the 
 
 ## Done when
 
-- [ ] Installed from Edge on the laptop, the app opens in its own window with its own taskbar icon.
-- [ ] Added to the iPad Home Screen, it opens full screen as a web app.
-- [ ] Inside the installed app on both devices, the camera starts from the button and the landmarks follow the hand.
-- [ ] Detection runs at 20 fps or more on the iPad and 25 fps or more on the laptop; the worker decision is recorded.
-- [ ] The camera stops when the app is hidden and restarts on return.
-- [ ] After the first load, the app opens and tracks hands with the device offline.
-- [ ] The error log shows a test error on the iPad, and Copy works (A6).
-- [ ] `npm test` passes. The MediaPipe version, the model's size and SHA-256, and the app's address are recorded in `DECISIONS.md` §4.
+- [x] Installed from Edge on the laptop, the app opens in its own window with its own taskbar icon.
+- [x] Added to the iPad Home Screen, it opens full screen as a web app.
+- [x] Inside the installed app on both devices, the camera starts from the button and the landmarks follow the hand.
+- [x] Detection runs at 20 fps or more on the iPad and 25 fps or more on the laptop; the worker decision is recorded. *Confirmed with a note: the laptop ran at 36.9 to 60 fps; the iPad's rate wasn't measured, by Daniella's choice (`DECISIONS.md` §3).*
+- [x] The camera stops when the app is hidden and restarts on return.
+- [x] After the first load, the app opens and tracks hands with the device offline.
+- [x] The error log shows a test error on the iPad, and Copy works (A6).
+- [x] `npm test` passes. The MediaPipe version, the model's size and SHA-256, and the app's address are recorded in `DECISIONS.md` §4.
 
 ## Not in this phase
 
