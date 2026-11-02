@@ -51,9 +51,12 @@ export function createDevPanel({ game, cfg }) {
 
   function buildTime(section) {
     const { awayFor, inAppFor, speeds, clockBackMs } = cfg.devPanel;
+    // The note repeats the meters, which the open panel can cover on a narrow screen.
     const note = status();
     const done = (text) => {
-      note.textContent = `Done: ${text}.`;
+      const { hunger, thirst, fun, affection, energy } = game.save.needs;
+      note.textContent = `Done: ${text}. Hunger ${hunger}, thirst ${thirst}, fun ${fun}, `
+        + `affection ${affection}, energy ${energy}.`;
       refresh();
     };
     group(section, 'Away for', 'Catch-up at away rates. Relaxed mode freezes the needs.',

@@ -15,30 +15,45 @@
       --text: #f4f1ea;
       --accent: #f2a65a;
       --accent-text: #1f1d2b;
+      --panel: rgb(31 29 43 / 0.88);
       color-scheme: dark;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
-    html, body { margin: 0; }
+    html, body { margin: 0; height: 100%; }
 
+    /* The game area: no scrolling, no long-press callout and no text
+       selection (Phase 1 pitfalls); no double-tap zoom on buttons. */
     body {
-      min-height: 100vh;
+      overflow: hidden;
+      overscroll-behavior: none;
       background: var(--background);
       color: var(--text);
       font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
-      /* Keeps clear of the iPad's rounded corners and home indicator */
-      padding:
-        max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-        max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
     }
 
     [hidden] { display: none !important; }
 
+    /* The room and the cat. touch-action: none stops the iPad scrolling or
+       zooming while you play (PLAN §6.7). */
+    .scene {
+      position: fixed;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
     button {
       min-width: 44px;
       min-height: 44px;
-      padding: 10px 20px;
+      padding: 10px 16px;
       border: 0;
       border-radius: 10px;
       background: var(--accent);
@@ -48,75 +63,102 @@
       cursor: pointer;
     }
 
-    button:focus-visible {
+    button:focus-visible,
+    input:focus-visible {
       outline: 3px solid var(--text);
       outline-offset: 3px;
     }
 
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding-bottom: 72px; /* room for the version label */
-    }
-
-    /* The video and the landmark overlay, mirrored together so the dots stay
-       on the hand (PLAN §6.1 step 4). main.js sets --ratio from the video. */
-    .stage {
-      --ratio: 1.3333;
-      position: relative;
-      width: min(100%, calc(70vh * var(--ratio)));
-      aspect-ratio: var(--ratio);
-      overflow: hidden;
-      border-radius: 12px;
-      background: #000;
-      transform: scaleX(-1);
-    }
-
-    .stage video,
-    .stage canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .stage video { object-fit: fill; }
-
-    .controls {
+    /* The HUD: meters, mood and Settings along the top, over the wall. Its
+       empty parts let touches through to the room. */
+    .hud {
+      position: fixed;
+      top: max(8px, env(safe-area-inset-top));
+      right: max(8px, env(safe-area-inset-right));
+      left: max(8px, env(safe-area-inset-left));
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: center;
-      gap: 12px 16px;
+      justify-content: flex-end;
+      gap: 8px;
+      pointer-events: none;
     }
 
-    .status { margin: 0; font-weight: 600; }
+    .hud > * { pointer-events: auto; }
 
-    .readouts {
+    .meters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .meter {
       display: grid;
-      grid-template-columns: auto auto;
-      gap: 4px 16px;
-      margin: 0;
+      grid-template-columns: 1fr auto;
+      gap: 2px 8px;
+      width: 104px;
+      font-size: 14px;
     }
 
-    .readouts dt { font-weight: 600; }
-    .readouts dd { margin: 0; font-variant-numeric: tabular-nums; }
+    .meter-number {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
 
-    /* The version label: 5 quick taps open the error log (PLAN §4.8). */
+    .meter-bar {
+      grid-column: 1 / -1;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 4px;
+      background: rgb(244 241 234 / 0.25);
+    }
+
+    .meter-fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    /* The lowest need, below 30, pulses (PLAN §5.4). The mood label names it
+       too, so nothing relies on colour or motion alone. */
+    .meter.low .meter-bar {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+      animation: pulse 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      to { opacity: 0.35; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .meter.low .meter-bar { animation: none; }
+    }
+
+    .mood {
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--panel);
+      font-weight: 600;
+    }
+
+    /* The version label: 5 quick taps open the developer panel (PLAN §4.8). */
     .version-label {
       position: fixed;
-      left: max(16px, env(safe-area-inset-left));
-      bottom: max(16px, env(safe-area-inset-bottom));
+      left: max(8px, env(safe-area-inset-left));
+      bottom: max(8px, env(safe-area-inset-bottom));
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 10px 12px;
-      background: transparent;
+      background: var(--panel);
       color: var(--text);
       font-weight: 400;
-      touch-action: manipulation; /* no double-tap zoom while tapping quickly */
     }
 
     .badge {
@@ -129,21 +171,141 @@
       text-align: center;
     }
 
-    /* The error log panel (A6) */
-    .errorlog {
-      width: min(100% - 32px, 760px);
-      max-height: calc(100% - 32px);
-      padding: 16px;
+    /* A message, such as a save that couldn't be read */
+    .message {
+      position: fixed;
+      left: 50%;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: min(100% - 32px, 560px);
+      padding: 12px 16px;
+      transform: translateX(-50%);
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      background: var(--background);
+    }
+
+    .message p { flex: 1; margin: 0; }
+
+    /* Settings */
+    .settings {
+      width: min(100% - 32px, 480px);
+      padding: 20px;
       border: 2px solid var(--accent);
       border-radius: 12px;
       background: var(--background);
       color: var(--text);
     }
 
-    .errorlog::backdrop { background: rgb(0 0 0 / 0.6); }
-    .errorlog h2 { margin: 0 0 4px; font-size: 1.25rem; }
-    .errorlog p { margin: 0 0 12px; }
+    .settings::backdrop { background: rgb(0 0 0 / 0.6); }
+    .settings h2 { margin: 0 0 12px; font-size: 1.25rem; }
+    .settings p { margin: 0 0 12px; }
 
+    .settings fieldset {
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      border: 1px solid rgb(244 241 234 / 0.5);
+      border-radius: 10px;
+    }
+
+    .choice {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    .choice input {
+      width: 24px;
+      height: 24px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    /* The developer panel (A4): on the left and non-modal, so the room stays
+       usable beside it. */
+    .devpanel {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 10;
+      width: min(380px, 100%);
+      max-width: none;
+      height: 100%;
+      max-height: none;
+      margin: 0;
+      padding: max(12px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 0;
+      border-right: 2px solid var(--accent);
+      background: var(--background);
+      color: var(--text);
+      touch-action: pan-y;
+    }
+
+    .devpanel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .devpanel h2 { margin: 0; font-size: 1.25rem; }
+    .devpanel h3 { margin: 16px 0 4px; font-size: 1rem; }
+    .devpanel p { margin: 0 0 8px; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0;
+    }
+
+    [role="tab"] {
+      background: rgb(244 241 234 / 0.15);
+      color: var(--text);
+    }
+
+    [role="tab"][aria-selected="true"],
+    button[aria-pressed="true"] {
+      background: var(--text);
+      color: var(--background);
+    }
+
+    .devpanel-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .devpanel-hint { font-size: 14px; }
+    .devpanel-note { min-height: 1.45em; margin-top: 12px; }
+
+    .devpanel-row {
+      display: grid;
+      grid-template-columns: 6.5em 1fr auto;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .devpanel-row input {
+      width: 100%;
+      min-height: 44px;
+      padding: 6px 10px;
+      border: 1px solid rgb(244 241 234 / 0.6);
+      border-radius: 8px;
+      background: #000;
+      color: var(--text);
+      font: inherit;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .devpanel-json,
     .errorlog-entries {
       max-height: 50vh;
       margin: 0 0 12px;
@@ -154,50 +316,85 @@
       font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-      user-select: text;
       -webkit-user-select: text;
+      user-select: text;
     }
 
-    .errorlog-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+    .devpanel-confirm {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 12px;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+    }
+
+    .devpanel-confirm p { flex-basis: 100%; margin: 0; }
   </style>
 </head>
 <body>
-  <main>
-    <div class="stage" id="stage">
-      <video id="video" playsinline muted autoplay></video>
-      <canvas id="overlay"></canvas>
-    </div>
+  <canvas class="scene" id="scene" role="img" aria-label="The room, with your cat"></canvas>
 
-    <div class="controls">
-      <p class="status" id="status" role="status">Camera off</p>
-      <button type="button" id="camera-button">Turn on camera</button>
-      <button type="button" id="retry-button" hidden>Try again</button>
-    </div>
+  <header class="hud">
+    <div class="meters" id="meters"></div>
+    <p class="mood" id="mood" role="status"></p>
+    <button type="button" id="settings-button">Settings</button>
+  </header>
 
-    <dl class="readouts">
-      <dt>Detection rate</dt><dd id="readout-rate">–</dd>
-      <dt>Detection time</dt><dd id="readout-time">–</dd>
-      <dt>Delegate</dt><dd id="readout-delegate">–</dd>
-      <dt>Video size</dt><dd id="readout-video">–</dd>
-    </dl>
-  </main>
+  <div class="message" id="message" role="alert" hidden>
+    <p id="message-text"></p>
+    <button type="button" id="message-close">OK</button>
+  </div>
+
+  <dialog class="settings" id="settings" aria-labelledby="settings-title">
+    <h2 id="settings-title">Settings</h2>
+    <fieldset>
+      <legend>Needs while the app is closed</legend>
+      <label class="choice">
+        <input type="radio" name="mode" value="live">
+        <span><strong>Live:</strong> needs drop slowly while you're away.</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="mode" value="relaxed">
+        <span><strong>Relaxed:</strong> needs pause while you're away.</span>
+      </label>
+    </fieldset>
+    <p id="settings-version"></p>
+    <button type="button" id="settings-close">Close</button>
+  </dialog>
 
   <button type="button" class="version-label" id="version-label">
     <span id="version-text">v?</span>
     <span class="badge" id="error-badge" hidden></span>
   </button>
 
-  <dialog class="errorlog" id="errorlog" aria-labelledby="errorlog-title">
-    <h2 id="errorlog-title">Error log</h2>
-    <p id="errorlog-summary"></p>
-    <pre class="errorlog-entries" id="errorlog-entries"></pre>
-    <p id="errorlog-note" role="status"></p>
-    <div class="errorlog-buttons">
-      <button type="button" id="errorlog-copy">Copy</button>
-      <button type="button" id="errorlog-clear">Clear</button>
-      <button type="button" id="errorlog-test">Test error</button>
-      <button type="button" id="errorlog-close">Close</button>
+  <!-- The developer panel (A4). Until devpanel.js loads, only the Errors tab
+       shows, so the error log works even if the game can't start. -->
+  <dialog class="devpanel" id="devpanel" aria-labelledby="devpanel-title">
+    <div class="devpanel-head">
+      <h2 id="devpanel-title">Developer</h2>
+      <button type="button" id="devpanel-close">Close</button>
     </div>
+    <div class="tabs" role="tablist" aria-label="Developer panel">
+      <button type="button" role="tab" id="tab-time" data-tab="time" aria-controls="devpanel-time" aria-selected="false">Time</button>
+      <button type="button" role="tab" id="tab-meters" data-tab="meters" aria-controls="devpanel-meters" aria-selected="false">Meters</button>
+      <button type="button" role="tab" id="tab-save" data-tab="save" aria-controls="devpanel-save" aria-selected="false">Save</button>
+      <button type="button" role="tab" id="tab-errors" data-tab="errors" aria-controls="devpanel-errors" aria-selected="true">Errors</button>
+    </div>
+    <section id="devpanel-time" role="tabpanel" aria-labelledby="tab-time" hidden></section>
+    <section id="devpanel-meters" role="tabpanel" aria-labelledby="tab-meters" hidden></section>
+    <section id="devpanel-save" role="tabpanel" aria-labelledby="tab-save" hidden></section>
+    <section id="devpanel-errors" role="tabpanel" aria-labelledby="tab-errors">
+      <p id="errorlog-summary"></p>
+      <pre class="errorlog-entries" id="errorlog-entries"></pre>
+      <p id="errorlog-note" role="status"></p>
+      <div class="devpanel-buttons">
+        <button type="button" id="errorlog-copy">Copy</button>
+        <button type="button" id="errorlog-clear">Clear</button>
+        <button type="button" id="errorlog-test">Test error</button>
+      </div>
+    </section>
   </dialog>
 
   <!-- The error log has its own script, so it still runs if another file
