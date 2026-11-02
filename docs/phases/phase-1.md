@@ -34,8 +34,9 @@ The cat exists and lives. Needs, energy and sleep follow PLAN §5 exactly, behav
 2. **`src/clock.js`:**
    - `now()`
    - `advance(ms)`, for the developer panel
-   - `setSpeed(n)` for 1×, 10× or 60×, re-based on every change so time never jumps backwards
-   - Uses `Date.now()` underneath; the only place in the app that reads the real clock
+   - `setSpeed(n)` for Pause (A8), 1×, 10× or 60×, re-based on every change so time never jumps backwards
+   - `wallNow()`: unscaled wall time for the 10 s gap rule (`DECISIONS.md` §3)
+   - Uses `Date.now()` underneath and is the only module that reads it. Touch timing and on-screen motion use the browser's own event and frame times (`DECISIONS.md` §3)
 3. **`src/events.js`:** `on`, `off` and `emit`, with the fixed vocabulary from PLAN §4.5 rule 1. In developer mode, an unknown event name logs a warning. `pet:stroke` carries `{ x, y, speed }`.
 4. **`src/storage.js`:**
    - `createStorage(backend)`, so tests can pass a fake in place of `localStorage`
@@ -68,13 +69,13 @@ The cat exists and lives. Needs, energy and sleep follow PLAN §5 exactly, behav
 9. **`src/render/placeholder.js`** (Phase 1 version): a simple shape cat (body, head, ears) that visibly changes with state. It closes its eyes when asleep, shows a sleep bubble, tilts its head when refusing, and so on. The state and mood are written above it. The mouth point comes from `config.js`.
 10. **`src/ui/hud.js`:** five meter bars with numbers and labels, the mood label, and a settings panel with the Live/Relaxed switch and the version label.
 11. **`src/ui/devpanel.js`** (A4), opened by 5 taps on the version label within 3 s, with four tabs:
-    - **Time:** "Away for" 10 min, 1 h, 6 h, 1 day, 7 days and 40 days (runs catch-up with away rates and respects Relaxed mode). "In app for" 1 min, 10 min and 1 h (calls the in-app tick directly with the whole duration, bypassing the 10 s gap rule). Speed 1×, 10× and 60×. "Clock back 1 h".
-    - **Meters:** set any meter; "Reset meters to start values" (80, 80, 80, 80, 90, progress 0); set asleep or awake.
+    - **Time:** "Away for" 10 min, 1 h, 2 h, 6 h, 1 day, 7 days and 40 days (runs catch-up with away rates and respects Relaxed mode). "In app for" 1 min, 10 min and 1 h (calls the in-app tick directly with the whole duration, bypassing the 10 s gap rule). Speed: Pause (A8), 1×, 10× and 60×. "Clock back 1 h".
+    - **Meters:** set any meter; "Reset meters to start values" (80, 80, 80, 80, 90, progress 0, cat awake); set asleep or awake.
     - **Save:** show the save JSON; Reset save, with an in-app confirmation (no `confirm()` dialogs).
     - **Errors:** the A6 log, moved here from Phase 0.
 12. **`src/main.js`:**
     - Boot: error log, then load the save, run catch-up, set the launch state, request persistent storage.
-    - Loop (`requestAnimationFrame`): elapsed time from `clock.now()`; a gap over 10 s goes to `catchUp`; then needs tick, behaviour step, effects applied, drawing.
+    - Loop (`requestAnimationFrame`): elapsed time from `clock.now()`; a gap over 10 s, measured on wall time, or a clock that moved back goes to `catchUp` (`DECISIONS.md` §3); then needs tick, behaviour step, effects applied, drawing.
     - Saving: every 10 s, after every meter change and action, on `visibilitychange` (hidden) and on `pagehide`.
     - Catch-up again on becoming visible.
 13. **`index.html`:** replace the Phase 0 test page with the game page (canvas plus HUD containers). Leave `src/input/camera.js` and `src/input/hands.js` unchanged for Phase 2; no camera button in this phase.
@@ -86,7 +87,8 @@ The cat exists and lives. Needs, energy and sleep follow PLAN §5 exactly, behav
   - Every row of PLAN §5.8
   - A backwards clock; the 30-day cap; Relaxed mode
   - A remainder carried across two catch-ups
-  - The floating-point boundary: 600 ticks of 1000 ms give exactly 15 fun drops
+  - The floating-point boundary: 600 ticks of 1000 ms give exactly 15 fun drops. That case passes even without the 1e-9 guard, so energy over the same ticks (exactly 20) and fun over 10 minutes of 60 fps ticks (exactly 15) are tested too
+  - The gap rule (`chooseUpdate`): a 2-hour wall-clock gap goes to catch-up even when the frame gap is 16 ms; a 0.2 s frame at 60× stays an in-app tick
   - Gains clamp at 100 and meters at 0
   - Mood thresholds at 60, 30 and 15, with energy ignored
   - Elapsed time of 0 or less in the in-app tick changes nothing
@@ -101,36 +103,41 @@ The cat exists and lives. Needs, energy and sleep follow PLAN §5 exactly, behav
   - Flinch above 1200 units/s
   - The launch-state rules
 - **`tests/storage.test.js`:** a round trip; the `vpet.` prefix; a broken save goes to `vpet.save.broken`; schema validation; the default save matches PLAN §4.7 exactly, apart from the rolled aptitude and affinity.
+- **`tests/scene.test.js`** (CLAUDE.md rule 5): fitting the scene in landscape and portrait, screen to scene points, the hit test, and items floating back.
+- **`tests/clock.test.js`** (A7): speed changes and Pause never move game time back, and 60× runs 60 times faster.
 - **`tests/version.test.js`:** kept from Phase 0.
 
 ## Device test scripts
 
 ### Laptop (http://localhost:3000)
 
-1. On a fresh start (developer panel → Save → Reset save if needed), the meters read hunger 80, thirst 80, fun 80, affection 80 and energy 90; the mood is Happy; "Kitty" is idle.
-2. Developer panel → Time → **Away 6 h**: the meters read 77, 74, 79, 79 and 100.
+The developer panel opens when you click the version label (bottom-left) 5 times quickly. It sits on the left, with Close at the top. After each Time button, the line under the buttons lists all five meters. Pause (A8) stops game time, so the meters wait while you read; touch still works.
+
+1. Developer panel → Save → **Reset save…** → Reset. Then Time → **Pause**. The meters read hunger 80, thirst 80, fun 80, affection 80 and energy 90; the mood is Happy; "Kitty · Idle" shows above the cat.
+2. Time → **Away 6 h**: the meters read 77, 74, 79, 79 and 100.
 3. **Away 2 h**: they read 76, 72, 78, 79 and 100.
 4. Settings → Relaxed, then **Away 6 h**: nothing changes. Switch back to Live.
-5. Meters → **Reset meters to start values**, then Time → **In app 10 min**: the meters read 67, 63, 65, 70 and 70.
-6. Drag the food bowl to the cat. It eats for 3 s, and hunger becomes 100. Drag the bowl again: the cat sniffs and turns away, and the bowl floats back.
-7. Drag the water bowl to the cat: it drinks, and thirst rises by 40 (up to 100).
-8. Drag a treat from the jar to the cat: it is eaten in 1 s, and hunger rises by 5 (up to 100).
+5. Meters → **Reset meters to start values**, then Time → **In app 10 min**: the meters read 67, 63, 65, 70 and 70. Then Time → **1×**.
+6. Drag the food bowl to the cat's mouth. It eats for 3 s, and hunger becomes 100. Drag the bowl again: the cat sniffs and turns away, and the bowl floats back.
+7. Meters → set thirst to 40. Drag the water bowl to the cat: it drinks for 3 s, and thirst becomes 80.
+8. Meters → set hunger to 50. Drag a treat from the jar to the cat: it is eaten in 1 s, and hunger becomes 55.
 9. Drag slowly across the cat: it is petted, and affection rises by about 2 per second. Stop: within 0.8 s it is idle again. Drag very fast: it flinches.
 10. Hold 300 ms on empty floor: the wand appears and follows. Move it fast: the cat pounces, with fun +2 and at most one pounce a second. Release: about 2 s later the cat is idle.
-11. Meters → set energy to 21, then Time → **In app 1 min**. Energy reaches 20 or below and the cat falls asleep with a sleep bubble. Feeding and the wand are ignored. Petting still raises affection.
-12. Speed **60×**: the cat wakes at energy 100 after about 8 seconds of real time.
-13. Meters → set thirst to 29: the mood shows Needs attention. Set it to 14: Urgent. Set it to 40: Okay. Energy never changes the mood.
-14. Set energy to 59 and leave the cat alone at 60× for 3 s (3 minutes): it naps. Repeat with energy 70: no nap. (Energy drains about 6 points in those 3 minutes, so a start of 60 would already be below 60 by then.)
-15. Close the tab and open it again: the meters are the same, apart from small in-app drops. A sleeping cat is still asleep.
+11. Time → **Pause**. Meters → set affection to 50 and energy to 21, then Time → **In app 1 min**: energy reads 19, and the cat falls asleep with a sleep bubble. Time → **1×**. Feeding and the wand are ignored, and items float back. Petting still raises affection.
+12. Time → **60×**: the cat wakes at energy 100 within about 8 seconds of real time.
+13. Time → **Pause**. Meters → set thirst to 29: the mood shows "Needs attention: thirst" and the thirst bar pulses. Set it to 14: Urgent. Set it to 40: Okay. Set energy to 25: the mood stays Okay, because energy never changes the mood. (The cat may nap at 25; that's the nap rule.)
+14. Meters → set energy to 59, stroke the cat once, then **Set awake**. Time → **60×** and leave the cat alone: about 3 s later (3 game minutes) it naps. Repeat with energy 70: Pause, set energy to 70, stroke once, Set awake, 60×, and watch for 3 s: no nap. (At 60× energy keeps falling, so it naps a few seconds later, once below 60.) Time → **1×**.
+15. Meters → **Set asleep**. Close the tab and open http://localhost:3000 again: the meters are the same, apart from small drops, and the cat is still asleep. Settings → Relaxed, then close and reopen again: the same, still asleep. Switch back to Live.
 16. Time → **Clock back 1 h**: nothing changes.
 
 ### iPad (installed app, after `/deploy`)
 
 1. The version label matches the last deploy.
-2. Repeat laptop steps 6 to 10 with a finger. Dragging never scrolls or zooms the page.
-3. Go to the Home Screen, wait 2 minutes, and reopen the app. Any changes are tiny (away rates), and no errors appear.
-4. Rotate the iPad. The scene stays centred and nothing is cut off; landscape fills the screen best.
-5. Developer panel → Errors: empty, or copy the entries to Claude Code.
+2. Repeat laptop steps 1 to 5 (the time controls), tapping instead of clicking.
+3. Repeat laptop steps 6 to 10 with a finger. Dragging never scrolls or zooms the page.
+4. Go to the Home Screen, wait 2 minutes, and reopen the app. Any changes are tiny (away rates), and no errors appear.
+5. Rotate the iPad. The scene stays centred and nothing is cut off; landscape fills the screen best.
+6. Developer panel → Errors: empty, or copy the entries to Claude Code.
 
 ## Done when
 

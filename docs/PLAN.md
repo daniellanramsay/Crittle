@@ -193,7 +193,7 @@ MyVirtualPet/
 │  ├─ main.js                boot, game loop, wiring
 │  ├─ version.js             APP_VERSION (same value as sw.js line 1)
 │  ├─ config.js              every tunable number, copied from this plan; starts in Phase 0
-│  ├─ clock.js               the only time source; developer controls can skip or speed time
+│  ├─ clock.js               game time (developer controls can pause, speed or move it) and wall time
 │  ├─ storage.js             the only module that reads or writes the save
 │  ├─ events.js              the event bus and the fixed event vocabulary
 │  ├─ sim/needs.js           meters, decay, Live/Relaxed, catch-up, moods (pure)
@@ -229,7 +229,7 @@ Files appear in the phase that first needs them; no phase creates files a later 
 
 These prevent known failure modes. Every phase keeps all of them.
 
-1. **One event vocabulary.** Touch, mouse and hands all emit the same events: `cursor:move`, `cursor:hide`, `pet:stroke`, `grab:start`, `grab:move`, `grab:end`, `wand:move`, `wand:end`, `trick:sitpretty`, `trick:highfive`, `trick:spin`. The game never knows which input sent them, so the touch fallback cannot drift from hand play. New event names need approval.
+1. **One event vocabulary.** Touch, mouse and hands all emit the same events: `cursor:move`, `cursor:hide`, `pet:stroke`, `grab:start`, `grab:move`, `grab:end`, `wand:move`, `wand:end`, `trick:sitpretty`, `trick:highfive`, `trick:spin`. The game never knows which input sent them, so the touch fallback cannot drift from hand play. New event names need approval. Payloads, in scene units: `cursor:move` {x, y}; `pet:stroke` {x, y, speed}; `grab:start` {item, x, y}, where item is `food`, `water` or `treat`; `grab:move` and `grab:end` {x, y}; `wand:move` {x, y}; the others carry nothing.
 2. **Time from timestamps only.** Every change is computed from differences in `clock.now()`, never by counting timer ticks. Browsers slow timers in background windows, so counted ticks drift.
 3. **No URL changes after the page loads.** No hash routing, no `pushState`, no `href="#"` links; use buttons. In iPad Home Screen apps a hash change has stopped the camera and re-asked permission (WebKit bug 215884).
 4. **One persistence boundary.** Only `src/storage.js` touches `localStorage`. The save key is `vpet.save`, and every key starts with `vpet.`. Every GitHub Pages project on one account shares the web origin `<username>.github.io`, so storage is shared between projects unless keys are prefixed. The save is written after every meter change and action, every 10 s, and on `visibilitychange` (hidden) and `pagehide`. `navigator.storage.persist()` is requested at every launch.
@@ -280,9 +280,10 @@ These prevent known failure modes. Every phase keeps all of them.
 - `progress` stores how far each meter is toward its next one-point change, as a fraction, so partial time carries over between sessions. `progress.rest` does the same for the energy a cat regains while away (§5.7).
 - `asleep` records whether the cat was asleep at the last save (§5.6).
 - `breed` is one of `shorthair`, `fold`, `siamese`. `pattern` is one of `solid`, `bicolour`, `tabby`, `spotted`, `calico`, `tortoiseshell`, `colourpoint`. `eyes` is one of `green`, `gold`, `copper`, `blue`, `odd`. `nose` is one of `pink`, `black`, `brown`. Colours are `#rrggbb`; unused colour slots are `null`.
+- `settings.dev` is developer mode: opening the developer panel turns it on, and Reset save turns it off. In Phase 1 it adds a warning for unknown event names.
 - `settings.camera` is the camera switch in settings. When on, the app shows a "Turn on camera" button at launch; it never starts the camera by itself. `settings.preview` is the camera-preview switch (§6.5). `settings.tutorialDone` records that the first-run tutorial (A2) was finished or skipped.
 - `stats.commands` counts every trick command given (used for the learning-style label, §7.4).
-- **The first save** (Phase 1) is a default cat: Domestic Shorthair, orange tabby (as above), green eyes, pink nose, named "Kitty", with aptitude and affinity rolled as in §7.3. Phase 5's creator replaces it with the player's own cat.
+- **The first save** (Phase 1) is a default cat: Domestic Shorthair, orange tabby (as above), green eyes, pink nose, named "Kitty", with aptitude and affinity rolled as in §7.3 and rounded to 2 decimal places. Its `createdAt` and `lastSeenAt` are the moment it's made; the 0 above is the time the test uses. Phase 5's creator replaces it with the player's own cat.
 - Any change to this shape raises `schema` and adds a migration in `storage.js`.
 - If the save cannot be read, its raw text is kept under `vpet.save.broken`, a fresh save starts, and the app says so on screen.
 
@@ -290,7 +291,7 @@ These prevent known failure modes. Every phase keeps all of them.
 
 - `APP_VERSION` is `0.N.x` while phase N is being built, where N is the last finished phase tag plus 1 (0 before any tag). `/deploy` raises x by one. Finishing Phase 6 sets `1.0.0`.
 - The same value is written in `src/version.js` and on line 1 of `sw.js`; `tests/version.test.js` checks they match.
-- The version label sits in a corner of the screen. Tapping or clicking it 5 times within 3 s opens the developer panel (A4), which includes the error log (A6). In Phase 0, before the panel exists, it opens the error log.
+- The version label sits in a corner of the screen. Tapping or clicking it 5 times within 3 s opens the developer panel (A4), which includes the error log (A6). In Phase 0, before the panel exists, it opens the error log. From Phase 1 the log is the panel's Errors tab; `errorlog.js` still owns the label and opens the panel, so the Errors tab works even if the game fails to load.
 
 ---
 
@@ -323,7 +324,7 @@ What these rates mean in practice: going from full to below 30 ("needs attention
 - The cat falls asleep when energy is 20 or below, once its current action finishes.
 - It also naps when nobody has interacted for 3 minutes and energy is below 60. Any vocabulary event except `cursor:move` and `cursor:hide` counts as an interaction.
 - It wakes on its own when energy reaches 100. v1 has no way to wake it early.
-- While it sleeps, tricks, play and feeding (including treats) are ignored, a sleep bubble shows, and a held item floats back to the shelf. Petting still raises affection (+1 per 0.5 s) and shows a sleepy purr.
+- While it sleeps, tricks, play and feeding (including treats) are ignored, a sleep bubble shows, and a held item floats back to the shelf. Petting still raises affection (+1 per 0.5 s) and shows a sleepy purr. An item picked up while it sleeps floats back when released.
 - In the app, `progress.energy` counts toward the next ±1 in the current direction and resets to 0 when the cat falls asleep or wakes. While away, `progress.rest` counts toward the next +1 and carries over between catch-ups, so the mini view's once-a-minute catch-ups add up.
 
 ### 5.3 Live and Relaxed modes
@@ -364,7 +365,8 @@ At 0 nothing worse happens (D5).
 | Trick | A trick command that the cat attempts (§7.2) | The animation ends | The trick, or a confused head tilt |
 | Asleep | The sleep rules in §5.2 | Energy reaches 100 | Curls up, slow breathing, sleep bubble |
 
-- When two triggers arrive together, the order is: Asleep, Eating or drinking, Trick, Playing, Petted, Idle.
+- When two triggers arrive together, the order is: Asleep, Eating or drinking, Trick, Playing, Petted, Idle. A higher-priority trigger takes over at once (a bowl dropped during play is eaten); a lower one is ignored (strokes during a meal do nothing).
+- Details settled in Phase 1 (`DECISIONS.md` §3): sleep at energy 20 waits for a meal to finish or petting to end; the 3-minute nap timer counts from the last interaction, or from launch; a meal's gain arrives when it ends; stroking time counts the gaps between strokes that come within 0.8 s of each other; flinch, sniff, pounce and the idle extras are short reactions, not states; only one treat is out at a time.
 - The sad moods change the idle animation and expressions but never block an action.
 - **On launch**, after catch-up, the cat is Asleep if `asleep` was true and energy is below 100, or if energy is 20 or below. Otherwise it is Idle. The behaviour state itself is not saved.
 
@@ -396,6 +398,8 @@ export function catchUp(save, now, cfg) {
 ```
 
 The in-app tick uses the same pattern with the in-app intervals and the energy rules in §5.2. It runs only while the page is visible, receives the elapsed milliseconds since the previous tick, and also updates `lastSeenAt`. Elapsed time of 0 or less (the clock moved back) changes nothing. A gap longer than 10 s is handed to `catchUp` instead. The developer panel's "In app for" control calls the in-app tick directly with the whole duration, bypassing the gap rule.
+
+**Time sources (Phase 1, `DECISIONS.md` §3).** Game time, `clock.now()`, drives the cat; the developer panel can pause it, speed it up or move it. The 10 s gap is measured on unscaled wall time, `clock.wallNow()`, through the pure `chooseUpdate` in `needs.js`: frame times can stop while a computer sleeps, and a slow frame at 60× must not count as away. Game time that moved back also goes to `catchUp`, which changes nothing and re-bases `lastSeenAt`, and the cat's timers shift with it. Touch speeds, the 300 ms hold, items floating back and the 10 s autosave use the browser's own event and frame times.
 
 ### 5.8 Worked examples
 
@@ -484,6 +488,8 @@ A finger counts as extended when the wrist-to-tip distance is more than 1.15 tim
 | Tricks (Phase 4) | Sit pretty, High-five and Spin buttons, or keys 1, 2 and 3 |
 
 Both input types work at the same time; whichever moved last owns the cursor. Input uses Pointer Events, and the canvas has `touch-action: none` so the iPad does not scroll or zoom while playing.
+
+Touch and mouse follow one pointer at a time. "Empty floor" means anywhere that isn't the cat, a bowl or the jar, including the wall; moving more than 10 units during the 300 ms hold makes it a drag instead. Stroke speed is measured over the last 100 ms of movement, in the browser's own event times, so Pause and 60× never change how touch feels.
 
 ### 6.8 Tuning tools and recordings
 
