@@ -2,6 +2,10 @@
 // warnings and files that fail to load are also kept here, with a Copy button.
 // index.html loads this file on its own, before main.js, and it has no static
 // imports, so a file that fails elsewhere can't stop it (DECISIONS §3).
+//
+// Since Phase 1 the log is the developer panel's Errors tab. This file still
+// owns the version label (its text, error badge and 5 taps) and opens and
+// closes the panel, so the Errors tab works even if the game fails to load.
 
 const entries = []; // { time, level, message, stack }, oldest first
 let version = '?';
@@ -14,7 +18,7 @@ capture();
 const $ = (id) => document.getElementById(id);
 const label = $('version-label');
 const badge = $('error-badge');
-const panel = $('errorlog');
+const panel = $('devpanel');
 const summary = $('errorlog-summary');
 const list = $('errorlog-entries');
 const note = $('errorlog-note');
@@ -146,10 +150,11 @@ function wireUp() {
       throw new Error('Test error from the Test error button');
     });
   });
-  $('errorlog-close')?.addEventListener('click', () => panel.close());
+  $('devpanel-close')?.addEventListener('click', () => panel.close());
 }
 
-// 5 taps within 3 s open the log (PLAN §4.8; the numbers live in config.js).
+// 5 taps within 3 s open the developer panel (PLAN §4.8; the numbers live in
+// config.js).
 function onLabelTap() {
   if (!settings) return;
   const now = performance.now();
@@ -161,12 +166,27 @@ function onLabelTap() {
   }
 }
 
-function open() {
-  if (!panel || panel.open) return;
+// The panel is non-modal, so the game stays usable beside it. showErrors
+// turns to the Errors tab, for when the log opens by itself.
+function open(showErrors = false) {
+  if (!panel) return;
+  if (showErrors) showErrorsTab();
+  if (panel.open) return;
   note.textContent = '';
-  if (typeof panel.showModal === 'function') panel.showModal();
+  if (typeof panel.show === 'function') panel.show();
   else panel.setAttribute('open', '');
   render();
+}
+
+// devpanel.js switches tabs the same way: aria-selected on the tab, hidden on
+// its section.
+function showErrorsTab() {
+  for (const tab of panel.querySelectorAll('[role="tab"]')) {
+    const errors = tab.dataset.tab === 'errors';
+    tab.setAttribute('aria-selected', String(errors));
+    const section = document.getElementById(tab.getAttribute('aria-controls'));
+    if (section) section.hidden = !errors;
+  }
 }
 
 async function copy() {
@@ -191,6 +211,8 @@ function loadSettings() {
   import('../version.js')
     .then((module) => {
       version = module.APP_VERSION;
+      const text = $('version-text');
+      if (text) text.textContent = `v${version}`;
       render();
     })
     .catch((error) => add('error', ['The error log could not load version.js:', error]));
@@ -206,6 +228,6 @@ function loadSettings() {
     })
     .catch((error) => {
       add('error', ['The error log could not load config.js:', error]);
-      open(); // without its numbers it can't count taps, so it opens by itself
+      open(true); // without its numbers it can't count taps, so it opens by itself
     });
 }
