@@ -1,5 +1,4 @@
-# My Virtual Pet
-
+# Crittle
 A hand-tracked virtual cat for a Windows laptop and an iPad. You pet it, feed it, play with it and teach it tricks with your hand in front of the camera. It installs as its own app, with its own taskbar icon on the laptop and Home Screen icon on the iPad.
 
 **Status:** Phase 0 complete (1 November 2026): hand tracking runs in the installed app on the laptop and the iPad, including offline. Next: Phase 1.
