@@ -60,12 +60,12 @@ export function createDevPanel({ game, cfg }) {
       refresh();
     };
     group(section, 'Away for', 'Catch-up at away rates. Relaxed mode freezes the needs.',
-      awayFor.map((ms) => button(durationLabel(ms), () => {
+      awayFor.map((ms) => button(`Away ${durationLabel(ms)}`, () => {
         game.awayFor(ms);
         done(`away for ${durationLabel(ms)}`);
       })));
     group(section, 'In app for', 'One in-app tick for the whole time, with the cat as it is now.',
-      inAppFor.map((ms) => button(durationLabel(ms), () => {
+      inAppFor.map((ms) => button(`In app ${durationLabel(ms)}`, () => {
         game.inAppFor(ms);
         done(`in app for ${durationLabel(ms)}`);
       })));
@@ -110,13 +110,19 @@ export function createDevPanel({ game, cfg }) {
         const clamped = Math.min(100, Math.max(0, value));
         game.setMeter(key, clamped);
         note.textContent = `Done: ${label.toLowerCase()} set to ${clamped}.`;
-        input.blur();
         refresh();
       };
+      // 'change' fires as typing ends, however it ends: Enter, Done on the iPad
+      // keyboard, or a press on Set, which takes the focus before its click
+      // lands. Applying the number then stops refresh() putting the old one back.
+      input.addEventListener('change', set);
       input.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') set();
+        if (event.key === 'Enter') input.blur();
       });
-      row.append(name, input, button('Set', set));
+      row.append(name, input, button('Set', () => {
+        set();
+        input.blur();
+      }));
       list.append(row);
       meterInputs.set(key, input);
     }

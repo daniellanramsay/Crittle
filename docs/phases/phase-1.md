@@ -111,7 +111,7 @@ The cat exists and lives. Needs, energy and sleep follow PLAN §5 exactly, behav
 
 ### Laptop (http://localhost:3000)
 
-The developer panel opens when you click the version label (bottom-left) 5 times quickly. It sits on the left, with Close at the top. After each Time button, the line under the buttons lists all five meters. Pause (A8) stops game time, so the meters wait while you read; touch still works.
+The developer panel opens when you click the version label (bottom-left) 5 times quickly. It sits on the left, with Close at the top. After each Time button, the line under the buttons lists all five meters. Pause (A8) stops game time, so the meters wait while you read; touch still works. Do steps 1 to 5 in one sitting: closing the app ends Pause, and real time away then counts on top of the buttons.
 
 1. Developer panel → Save → **Reset save…** → Reset. Then Time → **Pause**. The meters read hunger 80, thirst 80, fun 80, affection 80 and energy 90; the mood is Happy; "Kitty · Idle" shows above the cat.
 2. Time → **Away 6 h**: the meters read 77, 74, 79, 79 and 100.
