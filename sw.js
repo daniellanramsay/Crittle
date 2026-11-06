@@ -1,4 +1,4 @@
-const APP_VERSION = '0.1.1';
+const APP_VERSION = '0.1.2';
 // The service worker (PLAN §4.5 rule 7; Phase 0 brief, step 9). /deploy raises
 // the version on line 1 together with src/version.js, and each version gets its
 // own cache.
