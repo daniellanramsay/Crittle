@@ -1,6 +1,6 @@
 # Phase 1: The cat lives, by touch and mouse
 
-Status: Not started
+Status: Done 6 Nov 2026, tag phase-1, version 0.1.2
 
 - **Versions during this phase:** 0.1.x
 - **Previous phase:** tag `phase-0` must exist.
@@ -141,13 +141,13 @@ The developer panel opens when you click the version label (bottom-left) 5 times
 
 ## Done when
 
-- [ ] `npm test` passes, including every worked example in PLAN §5.8.
-- [ ] Feeding, drinking, treats, petting and wand play work by mouse on the laptop and by touch on the iPad, with no page scrolling or zooming.
-- [ ] Sleep starts at energy 20 and ends at 100, and the 3-minute nap rule works.
-- [ ] Moods change at 30 and at 15, and ignore energy.
-- [ ] Closing and reopening restores everything in Live and Relaxed modes, including a sleeping cat.
-- [ ] The developer panel opens from the version label, and its time controls give the PLAN §5.8 values on both devices.
-- [ ] Layout positions and any other chosen numbers are recorded in `DECISIONS.md` §6.
+- [x] `npm test` passes, including every worked example in PLAN §5.8.
+- [x] Feeding, drinking, treats, petting and wand play work by mouse on the laptop and by touch on the iPad, with no page scrolling or zooming.
+- [x] Sleep starts at energy 20 and ends at 100, and the 3-minute nap rule works.
+- [x] Moods change at 30 and at 15, and ignore energy.
+- [x] Closing and reopening restores everything in Live and Relaxed modes, including a sleeping cat.
+- [x] The developer panel opens from the version label, and its time controls give the PLAN §5.8 values on both devices.
+- [x] Layout positions and any other chosen numbers are recorded in `DECISIONS.md` §6.
 
 ## Not in this phase
 

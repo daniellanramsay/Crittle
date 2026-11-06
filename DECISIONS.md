@@ -41,6 +41,7 @@ Not in the original request. Each is included unless struck.
 | A6 | On-screen error log | 0 | Confirmed (31 Oct 2026); added 31 Oct 2026 | The iPad has no developer console without a Mac; without this, iPad failures cannot be diagnosed |
 | A7 | `tests/clock.test.js`: speed changes and Pause never move game time back, and 60× runs 60 times faster | 1 | Confirmed (1 Nov 2026) | The 60× device checks depend on the clock, and the Phase 1 brief had no clock test |
 | A8 | A Pause speed in the developer panel's Time tab | 1 | Confirmed (1 Nov 2026) | In-app decay keeps running while you read and click; paused, the developer checks give exact values however long they take |
+| A9 | The Time tab's "Done" line lists all five meters | 1 | Confirmed (6 Nov 2026) | The open panel can cover the meters on a narrow screen, and the checks read them with it open |
 
 Further additions approved during the build get the next number (A7, A8, …) and a row here.
 
@@ -165,7 +166,7 @@ Numbers the plan left to a phase (for example object positions in Phase 1, purr 
 | Phase | Finished | Tag | Version | Notes |
 | --- | --- | --- | --- | --- |
 | 0 | 1 Nov 2026 | `phase-0` | 0.0.2 | Laptop, Edge at localhost (31 Oct 2026): 48.3 fps, 19.8 ms average over the last 60 detections, GPU delegate, video 640 × 480. The first camera start failed once with `NotReadableError: Could not start video source`; Try again worked. Laptop, installed app from GitHub Pages: online 60.0 fps, 12.3 ms, GPU, 640 × 480; offline (Wi-Fi off) 38.4 fps, 24.9 ms, GPU, 640 × 480. Offline it opened and tracked hands, but the camera and the first landmarks took a long time to appear, and the page lagged just before. Laptop, installed app, version 0.0.2 with the worker: 36.9 fps, 18.3 ms, GPU (worker), 640 × 480. iPad, Home Screen app: every check passed with versions 0.0.1 and 0.0.2, including offline; its readouts weren't measured (§3). |
-| 1 | — | — | — | |
+| 1 | 6 Nov 2026 | `phase-1` | 0.1.2 | Laptop, Edge: every check confirmed, with the moods steps run on their own on 6 Nov 2026, using Set. iPad, Home Screen app, version 0.1.1: the meter boxes put the old number back, because the panel's refresh overwrote a box once it lost focus and only Enter worked; fixed in 0.1.2, which also names each time button's group. Two iPad readings on 0.1.1 were off and their cause wasn't established: 72, 64, 76, 78, 100 after Away 2 h (exactly 16 hours away in total) and 80, 80, 80, 80, 90 after 10 min. The same steps gave the right numbers with real clicks in headless Edge, and the readings didn't come back. Daniella's first confirmation of the time controls was on v0.1.1. iPad, version 0.1.2, after a full close and reopen: the time controls and a meter box all matched. For Phase 2: `behaviour.js` ignores `cursor:hide` for now, so PLAN §6.3's No hand row (a held item floats back, the wand disappears) needs adding there, and Phase 2's build list doesn't name that file. |
 | 2 | — | — | — | |
 | 3 | — | — | — | |
 | 4 | — | — | — | |
